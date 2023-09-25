@@ -1,4 +1,7 @@
 # DS1054Z_screen_capture
+
+**Updates** Updated to work with python 3, fixed some errors, added some minor functionality. Python 3 port credit goes to doug-a-brunner
+
 'OscScreenGrabLAN.py' is a Python script that captures
 whatever is displayed on the screen of a Rigol DS1000Z series oscilloscope.
 
