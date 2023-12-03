@@ -57,9 +57,9 @@ logging.info("OS Platform: " + str(platform.uname()))
 log_running_python_versions()
 
 # Update the next lines for your own default settings:
-path_to_save = "captures/"
+path_to_save = "."
 save_format = "PNG"
-IP_DS1104Z = "192.168.1.3"
+IP_DS1104Z = "192.168.1.100"
 
 # Rigol/LXI specific constants
 port = 5555
@@ -78,7 +78,7 @@ script_name = os.path.basename(sys.argv[0])
 def print_help():
     print()
     print("Usage:")
-    print("    " + "python " + script_name + " mode oscilloscope_IP")
+    print("    " + "python " + script_name + " mode oscilloscope_IP [-t]")
     print()
     print("Usage examples:")
     print("    " + "python " + script_name + " single 192.168.1.3")
@@ -104,6 +104,8 @@ def print_help():
         "        Exits with 0 if successful. Exits with 1 if unsuccessful (Ex: scope waiting for trigger)"
     )
     print()
+    print("Option -t forces the trigger as if the FORCE button was pressed.")
+    print()
     print("    The program is using LXI protocol, so the computer")
     print("    must have LAN connection with the oscilloscope.")
     print("    USB and/or GPIB connections are not used by this software.")
@@ -111,6 +113,12 @@ def print_help():
     print("    No VISA, IVI or Rigol drivers are needed.")
     print()
 
+
+try:
+    sys.argv.remove('-t')
+    trigger_force = True
+except LookupError:
+    trigger_force = False
 
 # Read/verify file type
 if len(sys.argv) <= 1:
@@ -179,6 +187,10 @@ if mode == "single":
     command(tn, ":SING")
     sys.exit(0)
 
+if trigger_force:
+    command(tn, ":SING")
+    command(tn, ":TFOR")
+
 response = command(tn, ":TRIG:STAT?")
 if response.strip() == "WAIT":
     print("Oscillosope waiting for trigger. Can't get data.")
@@ -187,7 +199,7 @@ if response.strip() == "WAIT":
 # Prepare filename as C:\MODEL_SERIAL_YYYY-MM-DD_HH.MM.SS
 timestamp = time.strftime("%Y-%m-%d_%H.%M.%S", time.localtime())
 # filename = path_to_save + id_fields[model] + "_" + id_fields[serial] + "_" + timestamp
-filename = f"{path_to_save}{timestamp}_{random.randint(0,1000)}"
+filename = f"{path_to_save}/{timestamp}_{random.randint(0,1000)}"
 
 if mode in ["png", "bmp"]:
     # Ask for an oscilloscope display print screen
