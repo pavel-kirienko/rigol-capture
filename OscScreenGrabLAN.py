@@ -117,7 +117,7 @@ def print_help():
 try:
     sys.argv.remove('-t')
     trigger_force = True
-except LookupError:
+except (LookupError, ValueError):
     trigger_force = False
 
 # Read/verify file type
